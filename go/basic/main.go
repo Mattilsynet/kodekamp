@@ -19,7 +19,7 @@ func main() {
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/", fileServer)
 
-	mux.HandleFunc("POST /action", handlerAction)
+	mux.HandleFunc("/action/{kind}", handlerAction)
 
 	http.ListenAndServe("localhost:8080", mux)
 }
@@ -29,6 +29,9 @@ func handlerAction(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	// Get the kind parameter from the URL
+	kind := r.PathValue("kind")
 
 	// Set the content type to JSON for the response
 	w.Header().Set("Content-Type", "application/json")
@@ -42,7 +45,7 @@ func handlerAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Use the parsed data (for example, print it or process it)
-	fmt.Printf("Received action: %s\n", actionReq.Action)
+	fmt.Printf("Received action, message: %s, kind: %v\n", actionReq.Action, kind)
 
 	// Create a response message
 	response := ActionResponse{
