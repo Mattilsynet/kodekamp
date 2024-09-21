@@ -17,11 +17,10 @@ val quarkusPlatformVersion: String by project
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    implementation("io.quarkus:quarkus-rest-jackson")
+    implementation("io.quarkus:quarkus-resteasy-jackson")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
     implementation("io.quarkus:quarkus-kotlin")
-//    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-rest")
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
