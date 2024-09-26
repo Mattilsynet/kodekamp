@@ -8,18 +8,53 @@ class GameEngine {
 
     fun process(gameRequest: GameRequest): List<Ordre> {
         val ordre = mutableListOf<Ordre>()
-        val friendlyUnit = gameRequest.friendlyUnits[0]
-        val enemyUnit = gameRequest.enemyUnits[0]
+
+        for (i in 0 until gameRequest.friendlyUnits.size) {
+            val friendlyUnit = gameRequest.friendlyUnits[i]
+            val enemyUnit = gameRequest.enemyUnits.firstOrNull { enemyUnit -> isEnemyInRange(friendlyUnit, enemyUnit) }
+            if (enemyUnit != null) {
+                ordre.add(attack(friendlyUnit, enemyUnit))
+                continue
+            }
+        }
 
         for (i in 0 until gameRequest.moveActionsAvailable) {
+            val friendlyUnit = gameRequest.friendlyUnits[i]
+            val enemyUnit = gameRequest.enemyUnits[0]
             ordre.add(move(friendlyUnit, enemyUnit))
         }
-        
-        for (i in 0 until gameRequest.attackActionsAvailable) {
-            ordre.add(attack(friendlyUnit, enemyUnit))
+
+        for (i in 0 until gameRequest.friendlyUnits.size) {
+            val friendlyUnit = gameRequest.friendlyUnits[i]
+            val enemyUnit = gameRequest.enemyUnits.firstOrNull { enemyUnit -> isEnemyInRange(friendlyUnit, enemyUnit) }
+            if (enemyUnit != null) {
+                ordre.add(attack(friendlyUnit, enemyUnit))
+                continue
+            }
         }
+
         return ordre
     }
+
+    private fun moveVertically(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Ordre {
+        return Ordre(
+            unit = friendlyUnit.id,
+            action = "move",
+            x = friendlyUnit.x - 1,
+            y = enemyUnit.y
+        )
+    }
+
+    private fun moveHorizontally(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Ordre {
+        return Ordre(
+            unit = friendlyUnit.id,
+            action = "move",
+            x = enemyUnit.x,
+            y = friendlyUnit.y - 1
+        )
+    }
+
+
 
     private fun move(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Ordre {
         return Ordre(
@@ -30,7 +65,7 @@ class GameEngine {
         )
     }
 
-    private fun attack(friendlyUnit: FriendlyUnit,  enemyUnit: EnemyUnit): Ordre {
+    private fun attack(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Ordre {
         return Ordre(
             unit = friendlyUnit.id,
             action = "attack",
@@ -40,7 +75,12 @@ class GameEngine {
     }
 
     private fun isEnemyInRange(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Boolean {
-        return friendlyUnit.x - enemyUnit.x == 1 || friendlyUnit.y - enemyUnit.y == 1
+        if (friendlyUnit.x == enemyUnit.x && Math.abs(friendlyUnit.y - enemyUnit.y) == 1) {
+            return true
+        } else if (friendlyUnit.y == enemyUnit.y && Math.abs(friendlyUnit.x - enemyUnit.x) == 1) {
+            return true
+        }
+        return false
     }
 
     private fun nearestEnemy(friendlyUnits: List<FriendlyUnit>, enemyUnits: List<EnemyUnit>): FriendlyEnemyPair {
