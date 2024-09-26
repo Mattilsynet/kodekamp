@@ -42,4 +42,26 @@ class GameEngine {
     private fun isEnemyInRange(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Boolean {
         return friendlyUnit.x - enemyUnit.x == 1 || friendlyUnit.y - enemyUnit.y == 1
     }
+
+    private fun nearestEnemy(friendlyUnits: List<FriendlyUnit>, enemyUnits: List<EnemyUnit>): FriendlyEnemyPair {
+        var minDistance = Double.MAX_VALUE
+        var closestPair: FriendlyEnemyPair? = null
+
+        for (friendlyUnit in friendlyUnits) {
+            for (enemyUnit in enemyUnits) {
+                val distance = Math.sqrt(Math.pow((friendlyUnit.x - enemyUnit.x).toDouble(), 2.0) + Math.pow((friendlyUnit.y - enemyUnit.y).toDouble(), 2.0))
+                if (distance < minDistance) {
+                    minDistance = distance
+                    closestPair = FriendlyEnemyPair(friendlyUnit, enemyUnit)
+                }
+            }
+        }
+
+        return closestPair!!
+    }
 }
+
+class FriendlyEnemyPair(
+    val friendlyUnit: FriendlyUnit,
+    val enemyUnit: EnemyUnit
+)
