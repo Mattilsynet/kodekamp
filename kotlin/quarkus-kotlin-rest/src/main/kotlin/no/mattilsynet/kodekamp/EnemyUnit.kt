@@ -7,7 +7,7 @@ data class EnemyUnit(
     val attackStrength: Int,
     val id: String,
     val kind: String,
-    val health: Int,
+    var health: Int,
     val side: String,
     val armor: Int,
     val x: Int,

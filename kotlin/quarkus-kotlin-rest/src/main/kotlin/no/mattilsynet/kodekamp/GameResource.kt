@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.Response
 
 @Path("/game")
 class GameResource(
-    private val gameEngine: GameEngine,
+    private val gameEngine: GameEngineV2,
     private val objectMapper: ObjectMapper
 ) {
 
@@ -19,7 +19,7 @@ class GameResource(
     @Produces(MediaType.APPLICATION_JSON)
     fun inputText(inputString: String): Response {
         val gameRequest: GameRequest = objectMapper.readValue(inputString, GameRequest::class.java)
-        return Response.ok(gameEngine.process(gameRequest)).build()
+        return Response.ok(gameEngine.process2(gameRequest)).build()
     }
 
 }
