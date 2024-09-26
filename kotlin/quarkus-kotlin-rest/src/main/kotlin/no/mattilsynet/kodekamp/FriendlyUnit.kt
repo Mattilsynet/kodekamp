@@ -1,8 +1,8 @@
 package no.mattilsynet.kodekamp
 
 data class FriendlyUnit(
-    val y: Int,
-    val moves: Int,
+    var y: Int,
+    var moves: Int,
     val maxHealth: Int,
     val attackStrength: Int,
     val id: String,
@@ -10,17 +10,17 @@ data class FriendlyUnit(
     val health: Int,
     val side: String,
     val armor: Int,
-    val x: Int,
+    var x: Int,
     val attacks: Int
 ) {
 
-    fun move() {
-        println("Unit $id moves")
+    fun move(x: Int, y: Int): Ordre {
+        this.y = y
+        this.x = x
+        this.moves--
+        return Ordre(id, "move", x, y)
     }
 
-    fun attack() {
-        println("Unit $id attacks")
-    }
 
 }
 

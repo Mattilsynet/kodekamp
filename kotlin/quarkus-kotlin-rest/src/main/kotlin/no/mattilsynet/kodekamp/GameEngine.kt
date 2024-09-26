@@ -8,33 +8,73 @@ class GameEngine {
 
     fun process(gameRequest: GameRequest): List<Ordre> {
         val ordre = mutableListOf<Ordre>()
+        var remainingAttacks = gameRequest.attackActionsAvailable
 
-        for (i in 0 until gameRequest.friendlyUnits.size) {
-            val friendlyUnit = gameRequest.friendlyUnits[i]
-            val enemyUnit = gameRequest.enemyUnits.firstOrNull { enemyUnit -> isEnemyInRange(friendlyUnit, enemyUnit) }
-            if (enemyUnit != null) {
-                ordre.add(attack(friendlyUnit, enemyUnit))
-                continue
-            }
+        attackNearbyEnemies(gameRequest, remainingAttacks, ordre)
+        remainingAttacks -= ordre.size
+
+        moveToEnemy(gameRequest.friendlyUnits[0], gameRequest.enemyUnits[0], gameRequest.enemyUnits, gameRequest.moveActionsAvailable).forEach {
+            ordre.add(it)
         }
 
-        for (i in 0 until gameRequest.moveActionsAvailable) {
-            val friendlyUnit = gameRequest.friendlyUnits[i]
-            val enemyUnit = gameRequest.enemyUnits[0]
-            ordre.add(move(friendlyUnit, enemyUnit))
-        }
-
-        for (i in 0 until gameRequest.friendlyUnits.size) {
-            val friendlyUnit = gameRequest.friendlyUnits[i]
-            val enemyUnit = gameRequest.enemyUnits.firstOrNull { enemyUnit -> isEnemyInRange(friendlyUnit, enemyUnit) }
-            if (enemyUnit != null) {
-                ordre.add(attack(friendlyUnit, enemyUnit))
-                continue
-            }
-        }
+        attackNearbyEnemies(gameRequest, remainingAttacks, ordre)
 
         return ordre
     }
+
+    private fun attackNearbyEnemies(
+        gameRequest: GameRequest,
+        remainingAttacks: Int,
+        ordre: MutableList<Ordre>
+    ) {
+
+        for (i in 0 until gameRequest.friendlyUnits.size) {
+            val friendlyUnit = gameRequest.friendlyUnits[i]
+            val enemyUnit = gameRequest.enemyUnits.firstOrNull { enemyUnit -> isEnemyInRange(friendlyUnit, enemyUnit) }
+            if (enemyUnit != null && remainingAttacks > 0) {
+                ordre.add(attack(friendlyUnit, enemyUnit))
+                continue
+            }
+        }
+    }
+
+    private fun anyEnemiesInRange(friendlyUnit: FriendlyUnit, enemyUnits: List<EnemyUnit>): Boolean {
+        return enemyUnits.any { enemyUnit -> isEnemyInRange(friendlyUnit, enemyUnit) }
+    }
+
+    private fun canMoveAdjacent(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit, availableMoves: Int): Boolean {
+        val distance = Math.abs(friendlyUnit.x - enemyUnit.x) + Math.abs(friendlyUnit.y - enemyUnit.y)
+        return distance <= availableMoves + 1
+    }
+
+    private fun moveToEnemy(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit, enemyUnits: List<EnemyUnit>, availableMoves: Int): List<Ordre> {
+        var moves = Math.min(availableMoves, friendlyUnit.moves)
+        val orders = mutableListOf<Ordre>()
+
+        while (moves > 0 && !anyEnemiesInRange(friendlyUnit, enemyUnits)) {
+            if (friendlyUnit.x < enemyUnit.x) {
+                orders.add(friendlyUnit.move(x = friendlyUnit.x + 1, y = friendlyUnit.y))
+            } else if (friendlyUnit.x > enemyUnit.x) {
+                orders.add(friendlyUnit.move(x = friendlyUnit.x - 1, y = friendlyUnit.y))
+            }
+
+            else if (friendlyUnit.y < enemyUnit.y) {
+                orders.add(friendlyUnit.move(x = friendlyUnit.x, y = friendlyUnit.y + 1))
+            } else if (friendlyUnit.y > enemyUnit.y) {
+                orders.add(friendlyUnit.move(x = friendlyUnit.x, y = friendlyUnit.y - 1))
+            }
+
+
+            moves -= 1
+        }
+
+        return orders
+    }
+
+
+
+
+
 
     private fun moveVertically(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Ordre {
         return Ordre(
