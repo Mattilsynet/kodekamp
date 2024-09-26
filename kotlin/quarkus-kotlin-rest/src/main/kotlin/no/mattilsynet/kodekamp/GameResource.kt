@@ -28,7 +28,10 @@ class GameResource(
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     fun input(gameBoard: GameBoard): Response {
-        return Response.ok(gameEngine.process(gameBoard)).build()
+        Log.info("Start..")
+        val process = gameEngine.process(gameBoard)
+        Log.info("Sending back..")
+        return Response.ok(process).build()
     }
 
 

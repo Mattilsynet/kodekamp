@@ -23,12 +23,41 @@ data class Character(
     var side: String,
     var armor: Int,
     var x: Int,
-    var attacks: Int
-)
+    var attacks: Int,
+    private val isPiercing: Boolean? = null
+) {
+
+    fun isPiercing() = isPiercing ?: false
+
+    fun isArcher() = kind == "archer"
+    fun isBarbarian() = kind == "barbarian"
+
+    fun isWizard() = kind == "wizard"
+
+    fun isDead() = health < 1
+
+    fun isRage() = isArcher() || isWizard()
+
+}
 
 data class Moves(
     var unit: String,
     var action: String,
     var x: Int,
     var y: Int
+)
+
+data class PMoves(
+    var unit: String,
+    var action: String,
+    var x: Int,
+    var y: Int,
+    var damage: Int? = null
+)
+
+fun PMoves.toMove() = Moves(
+    unit = this@toMove.unit,
+    action = this@toMove.action,
+    x = this@toMove.x,
+    y = this@toMove.y,
 )
