@@ -38,4 +38,8 @@ class GameEngine {
             y = enemyUnit.y
         )
     }
+
+    private fun isEnemyInRange(friendlyUnit: FriendlyUnit, enemyUnit: EnemyUnit): Boolean {
+        return friendlyUnit.x - enemyUnit.x == 1 || friendlyUnit.y - enemyUnit.y == 1
+    }
 }
